@@ -33,40 +33,29 @@ namespace M.EventBroker
         public void Subscribe<TEvent>(Action<TEvent> handler, Func<TEvent, bool> filter = null)
         {
             var handlers = subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
-            handlers.Add(new InternalEventHandler<TEvent>(new DelegateEventHandler<TEvent>(handler, filter)));
+            handlers.Add(new EventHandlerWrapper<TEvent>(handler, filter));
         }
 
         public void Subscribe<TEvent>(IEventHandler<TEvent> handler)
         {
             var handlers = subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
-            handlers.Add(new InternalEventHandler<TEvent>(handler));
+            handlers.Add(new EventHandlerWrapper<TEvent>(handler));
         }
 
         public void Unsubscribe<TEvent>(Action<TEvent> handler)
         {
-            var handlers = subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
-            InternalEventHandler<TEvent>[] delegateHandlers = handlers.OfType<InternalEventHandler<TEvent>>().Where(x => ((DelegateEventHandler<TEvent>)x.EventHandler).Handler == handler).ToArray();
-            foreach (var handlerAction in delegateHandlers)
-            {
-                handlers.Remove(handlerAction);
-                handlerAction.Unsubscribed = true;
-            }
+            Unsubscribe<TEvent>(x => x.IsWrapping(handler));
         }
 
         public void Unsubscribe<TEvent>(IEventHandler<TEvent> handler)
         {
-            var handlers = subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
-            foreach (var handlerAction in handlers.OfType<InternalEventHandler<TEvent>>().Where(x => x.EventHandler == handler).ToArray())
-            {
-                handlers.Remove(handlerAction);
-                handlerAction.Unsubscribed = true;
-            }
+            Unsubscribe<TEvent>(x => x.IsWrapping(handler));
         }
 
         public void Publish<TEvent>(TEvent @event)
         {
-            EnqueueSubscribedHandlers(@event);
-            EnqueueActivatedHandlers(@event);
+            EnqueueSubscribers(@event);
+            EnqueueFromHandlersFactory(@event);
         }
 
         public void Dispose()
@@ -74,12 +63,24 @@ namespace M.EventBroker
             if (isRunning)
             {
                 isRunning = false;
-                // TODO: ?
                 Thread.Sleep(1000);
+            }
+
+            handlerActions.Dispose();
+        }
+
+        private void Unsubscribe<TEvent>(Func<EventHandlerWrapper<TEvent>, bool> handlerPredicate)
+        {
+            var handlers = subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
+            var targetHandlers = handlers.Cast<EventHandlerWrapper<TEvent>>().ToArray();
+            foreach (var handlerAction in targetHandlers.Where(x => handlerPredicate(x)))
+            {
+                handlers.Remove(handlerAction);
+                handlerAction.IsSubscribed = false;
             }
         }
 
-        private void EnqueueSubscribedHandlers<TEvent>(TEvent @event)
+        private void EnqueueSubscribers<TEvent>(TEvent @event)
         {
             bool hasSubscribers = subscribers.TryGetValue(typeof(TEvent), out List<object> handlers);
             if (!hasSubscribers)
@@ -87,13 +88,12 @@ namespace M.EventBroker
                 return;
             }
 
-            foreach (var handler in handlers.Cast<IEventHandler<TEvent>>().ToArray())
+            foreach (var handler in handlers.Cast<EventHandlerWrapper<TEvent>>().ToArray())
             {
                 var handler1 = handler;
                 handlerActions.Add(() =>
                 {
-                    var status = handler1 as IHandlerStatus;
-                    if (status != null && status.Unsubscribed)
+                    if (!handler1.IsSubscribed)
                     {
                         return;
                     }
@@ -108,7 +108,7 @@ namespace M.EventBroker
             }
         }
 
-        private void EnqueueActivatedHandlers<TEvent>(TEvent @event)
+        private void EnqueueFromHandlersFactory<TEvent>(TEvent @event)
         {
             if (handlersFactory == null)
             {
@@ -116,15 +116,17 @@ namespace M.EventBroker
             }
 
             var handlerInstances = handlersFactory(typeof(TEvent));
-            foreach (var handler in handlerInstances.Cast<IEventHandler<TEvent>>())
+            foreach (var handler in handlerInstances.Cast<IEventHandler<TEvent>>().ToArray())
             {
                 var handler1 = handler;
                 handlerActions.Add(() =>
                 {
-                    if (handler1.ShouldHandle(@event))
+                    if (!handler1.ShouldHandle(@event))
                     {
-                        handler1.Handle(@event);
+                        return;
                     }
+
+                    handler1.Handle(@event);
                 });
             }
         }
@@ -134,18 +136,19 @@ namespace M.EventBroker
             int timeout = (int)TimeSpan.FromSeconds(1).TotalMilliseconds;
             while (isRunning)
             {
-                if (handlerActions.TryTake(out Action action, timeout))
+                if (!handlerActions.TryTake(out Action action, timeout))
                 {
-                    try
-                    {
-                        action();
-                    }
-                    catch (Exception ex)
-                    {
-                        errorReporter?.Invoke(ex);
-                    }
+                    continue;
                 }
 
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    errorReporter?.Invoke(ex);
+                }
             }
         }
     }

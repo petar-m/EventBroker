@@ -2,13 +2,14 @@
 
 namespace M.EventBroker
 {
-    internal class DelegateEventHandler<TEvent> : IEventHandler<TEvent>, IHandlerStatus
+    public class DelegateEventHandler<TEvent> : IEventHandler<TEvent>
     {
+        private readonly Action<TEvent> handler;
         private readonly Func<TEvent, bool> filter;
 
         public DelegateEventHandler(Action<TEvent> handler, Func<TEvent, bool> filter = null)
         {
-            Handler = handler;
+            this.handler = handler;
             this.filter = filter;
         }
 
@@ -19,14 +20,7 @@ namespace M.EventBroker
 
         public void Handle(TEvent @event)
         {
-            Handler(@event);
-        }
-
-        public Action<TEvent> Handler { get; }
-
-        public bool Unsubscribed
-        {
-            get; set;
+            handler(@event);
         }
     }
 }
