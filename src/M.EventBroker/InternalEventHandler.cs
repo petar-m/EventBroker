@@ -19,9 +19,9 @@
             EventHandler.Handle(@event);
         }
 
-        public bool ExecuteHandler(TEvent @event)
+        public bool ShouldHandle(TEvent @event)
         {
-            return EventHandler.ExecuteHandler(@event);
+            return EventHandler.ShouldHandle(@event);
         }
     }
 }

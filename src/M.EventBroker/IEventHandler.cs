@@ -3,8 +3,7 @@
     public interface IEventHandler<TEvent>
     {
         void Handle(TEvent @event);
-        
-        // TODO: rename to be a question.
-        bool ExecuteHandler(TEvent @event);
+
+        bool ShouldHandle(TEvent @event);
     }
 }

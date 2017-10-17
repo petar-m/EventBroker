@@ -5,4 +5,3 @@
         bool Unsubscribed { get; }
     }
 }
-

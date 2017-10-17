@@ -2,7 +2,6 @@
 
 namespace M.EventBroker
 {
-
     internal class DelegateEventHandler<TEvent> : IEventHandler<TEvent>, IHandlerStatus
     {
         private readonly Func<TEvent, bool> filter;
@@ -13,7 +12,7 @@ namespace M.EventBroker
             this.filter = filter;
         }
 
-        public bool ExecuteHandler(TEvent @event)
+        public bool ShouldHandle(TEvent @event)
         {
             return filter == null || filter(@event);
         }

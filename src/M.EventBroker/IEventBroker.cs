@@ -14,6 +14,4 @@ namespace M.EventBroker
 
         void Publish<TEvent>(TEvent @event);
     }
-
 }
-

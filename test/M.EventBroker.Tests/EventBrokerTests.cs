@@ -1,6 +1,5 @@
-﻿using FakeItEasy;
-using System;
-using System.Threading;
+﻿using System.Threading;
+using FakeItEasy;
 using Xunit;
 
 namespace M.EventBroker.Tests
@@ -12,15 +11,14 @@ namespace M.EventBroker.Tests
         {
             var broker = new EventBroker(3);
             var handler = A.Fake<IEventHandler<string>>();
-            
             broker.Subscribe<string>(handler.Handle);
 
             broker.Publish("event");
 
             Thread.Sleep(100);
             A.CallTo(() => handler.Handle(null))
-             .WhenArgumentsMatch((c)=>c.Get<string>(0) == "event")
-             .MustHaveHappened( Repeated.Exactly.Once);
+             .WhenArgumentsMatch((c) => c.Get<string>(0) == "event")
+             .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         [Fact]
@@ -28,7 +26,7 @@ namespace M.EventBroker.Tests
         {
             var broker = new EventBroker(3);
             var handler = A.Fake<IEventHandler<string>>();
-            A.CallTo(() => handler.ExecuteHandler(null))
+            A.CallTo(() => handler.ShouldHandle(null))
              .WithAnyArguments()
              .Returns(true);
             broker.Subscribe(handler);
@@ -63,27 +61,14 @@ namespace M.EventBroker.Tests
             var broker = new EventBroker(3);
             var handler = A.Fake<IEventHandler<string>>();
 
-            broker.Subscribe<string>(handler);
-            broker.Unsubscribe<string>(handler);
+            broker.Subscribe(handler);
+            broker.Unsubscribe(handler);
             broker.Publish("event");
 
             Thread.Sleep(100);
             A.CallTo(() => handler.Handle(null))
              .WithAnyArguments()
              .MustNotHaveHappened();
-        }
-
-        public void Subscribe_WithIEventHandlerInstance_CreatesSubscribsion()
-        {
-            var broker = new EventBroker(3);
-            // TODO: Mock event handler, assert called
-            string @event = "event";
-            string result = null;
-            broker.Subscribe<string>(x => result = x);
-
-            broker.Publish(@event);
-
-            Assert.Equal(@event, result);
         }
     }
 }

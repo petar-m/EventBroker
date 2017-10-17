@@ -15,7 +15,7 @@ namespace M.EventBroker
         private readonly Func<Type, IEnumerable<object>> handlersFactory;
 
         public EventBroker(
-            int workerThreadsCount, 
+            int workerThreadsCount,
             Action<Exception> errorReporter = null,
             Func<Type, IEnumerable<object>> handlersFactory = null)
         {
@@ -28,16 +28,6 @@ namespace M.EventBroker
 
             this.errorReporter = errorReporter;
             this.handlersFactory = handlersFactory;
-        }
-
-        public void Dispose()
-        {
-            if (isRunning)
-            {
-                isRunning = false;
-                // TODO: ?
-                Thread.Sleep(1000);
-            }
         }
 
         public void Subscribe<TEvent>(Action<TEvent> handler, Func<TEvent, bool> filter = null)
@@ -79,6 +69,16 @@ namespace M.EventBroker
             EnqueueActivatedHandlers(@event);
         }
 
+        public void Dispose()
+        {
+            if (isRunning)
+            {
+                isRunning = false;
+                // TODO: ?
+                Thread.Sleep(1000);
+            }
+        }
+
         private void EnqueueSubscribedHandlers<TEvent>(TEvent @event)
         {
             bool hasSubscribers = subscribers.TryGetValue(typeof(TEvent), out List<object> handlers);
@@ -93,12 +93,12 @@ namespace M.EventBroker
                 handlerActions.Add(() =>
                 {
                     var status = handler1 as IHandlerStatus;
-                    if(status != null && status.Unsubscribed)
+                    if (status != null && status.Unsubscribed)
                     {
                         return;
                     }
 
-                    if (!handler1.ExecuteHandler(@event))
+                    if (!handler1.ShouldHandle(@event))
                     {
                         return;
                     }
@@ -121,14 +121,14 @@ namespace M.EventBroker
                 var handler1 = handler;
                 handlerActions.Add(() =>
                 {
-                    if (handler1.ExecuteHandler(@event))
+                    if (handler1.ShouldHandle(@event))
                     {
                         handler1.Handle(@event);
                     }
                 });
             }
         }
-        
+
         private void Worker()
         {
             int timeout = (int)TimeSpan.FromSeconds(1).TotalMilliseconds;
@@ -140,16 +140,13 @@ namespace M.EventBroker
                     {
                         action();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         errorReporter?.Invoke(ex);
                     }
-
                 }
 
             }
         }
     }
-
 }
-
