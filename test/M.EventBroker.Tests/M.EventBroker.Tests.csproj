@@ -1,14 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net47</TargetFrameworks>
-
+    <TargetFrameworks>netcoreapp2.0;net47;net461</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="4.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="OpenCover" Version="4.6.519" />
+    <PackageReference Include="ReportGenerator" Version="3.0.2" />
     <PackageReference Include="xunit" Version="2.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
   </ItemGroup>
@@ -17,4 +18,18 @@
     <ProjectReference Include="..\..\src\M.EventBroker\M.EventBroker.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="test_coverage\coverage\**" />
+    <EmbeddedResource Remove="test_coverage\coverage\**" />
+    <None Remove="test_coverage\coverage\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="test_coverage\coverage.xml" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  
 </Project>
