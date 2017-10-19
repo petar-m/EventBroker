@@ -3,14 +3,14 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <!--<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Authors>Petar Marinov</Authors>
     <Company>Petar Marinov</Company>
     <Description>A multi-threaded in-memory implementation of publish–subscribe pattern.</Description>
     <Copyright>Copyright (c) 2017 Petar Marinov</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl></RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/petar-m/EventBroker/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/petar-m/EventBroker</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/petar-m/EventBroker</RepositoryUrl>
     <PackageTags>event broker in-memory publish subscribe</PackageTags>
     <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>

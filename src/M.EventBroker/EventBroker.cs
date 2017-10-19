@@ -6,6 +6,9 @@ using System.Threading;
 
 namespace M.EventBroker
 {
+    /// <summary>
+    /// Manages event subscriptions and invoking of event handlers.
+    /// </summary>
     public class EventBroker : IEventBroker
     {
         private ConcurrentDictionary<Type, List<object>> subscribers = new ConcurrentDictionary<Type, List<object>>();
@@ -14,6 +17,12 @@ namespace M.EventBroker
         private readonly Action<Exception> errorReporter;
         private readonly Func<Type, IEnumerable<object>> handlersFactory;
 
+        /// <summary>
+        /// Creates a new instance of the EventBroker class.
+        /// </summary>
+        /// <param name="workerThreadsCount">Determines how many threads to use for calling event handlers.</param>
+        /// <param name="errorReporter">A delegate to be called when exception is thrown from handler.</param>
+        /// <param name="handlersFactory">A delegate providing event handlers for event of givent type.</param>
         public EventBroker(
             int workerThreadsCount,
             Action<Exception> errorReporter = null,
@@ -30,34 +39,63 @@ namespace M.EventBroker
             this.handlersFactory = handlersFactory;
         }
 
+        /// <summary>
+        /// Adds subscription for events of type <typeparamref name="TEvent"/>.
+        /// </summary>
+        /// <typeparam name="TEvent">The type of the event.</typeparam>
+        /// <param name="handler">A delegate that will be invoked when event is published.</param>
+        /// <param name="filter">A delegate used to perform filtering of events before invoking the handler.</param>
         public void Subscribe<TEvent>(Action<TEvent> handler, Func<TEvent, bool> filter = null)
         {
             var handlers = subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
             handlers.Add(new EventHandlerWrapper<TEvent>(handler, filter));
         }
 
+        /// <summary>
+        /// Adds subscription for events of type <typeparamref name="TEvent"/>.
+        /// </summary>
+        /// <typeparam name="TEvent">The type of the event.</typeparam>
+        /// <param name="handler">An instance of IEventHandler&lt;TEvent&gt; which Handle method will be invoked when event is published.</param>
         public void Subscribe<TEvent>(IEventHandler<TEvent> handler)
         {
             var handlers = subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
             handlers.Add(new EventHandlerWrapper<TEvent>(handler));
         }
 
+        /// <summary>
+        /// Removes subscription for events of type <typeparamref name="TEvent"/>.
+        /// </summary>
+        /// <typeparam name="TEvent">The type of the event.</typeparam>
+        /// <param name="handler">A delegate to remove form subscribers.</param>
         public void Unsubscribe<TEvent>(Action<TEvent> handler)
         {
             Unsubscribe<TEvent>(x => x.IsWrapping(handler));
         }
 
+        /// <summary>
+        /// Removes subscription for events of type <typeparamref name="TEvent"/>.
+        /// </summary>
+        /// <typeparam name="TEvent">The type of the event.</typeparam>
+        /// <param name="handler">An instance of IEventHandler&lt;TEvent&gt; to remove form subscribers.</param>
         public void Unsubscribe<TEvent>(IEventHandler<TEvent> handler)
         {
             Unsubscribe<TEvent>(x => x.IsWrapping(handler));
         }
 
+        /// <summary>
+        /// Publishes an event of type <typeparamref name="TEvent"/>.
+        /// </summary>
+        /// <typeparam name="TEvent">The type of the event.</typeparam>
+        /// <param name="event">An <typeparamref name="TEvent"/> instance to be passed to all handlers of the event. All handlers will be invoked asynchronously.</param>
         public void Publish<TEvent>(TEvent @event)
         {
             EnqueueSubscribers(@event);
             EnqueueFromHandlersFactory(@event);
         }
 
+        /// <summary>
+        /// Releases all resources used by the current instance of the EventBroker class.
+        /// </summary>
         public void Dispose()
         {
             if (isRunning)
@@ -116,6 +154,10 @@ namespace M.EventBroker
             }
 
             var handlerInstances = handlersFactory(typeof(TEvent));
+            if (handlerInstances == null)
+            {
+                return;
+            }
             foreach (var handler in handlerInstances.Cast<IEventHandler<TEvent>>().ToArray())
             {
                 var handler1 = handler;

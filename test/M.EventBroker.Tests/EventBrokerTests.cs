@@ -124,6 +124,16 @@ namespace M.EventBroker.Tests
         }
 
         [Fact]
+        public void Publish_WithHandlersReturningNull_NothingHappens()
+        {
+           var broker = new EventBroker(1, null, t => null);
+
+            broker.Publish("event");
+
+            Assert.True(true);
+        }
+
+        [Fact]
         public void Publish_WithHandlerInstanceSubscription_FilterIsRespected()
         {
             var handler = A.Fake<IEventHandler<string>>();

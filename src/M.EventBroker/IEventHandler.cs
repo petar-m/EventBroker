@@ -9,14 +9,14 @@
         /// <summary>
         /// Handles the event.
         /// </summary>
-        /// <param name="event"></param>
+        /// <param name="event">An instance of TEvent representing the event.</param>
         void Handle(TEvent @event);
 
         /// <summary>
         /// Returns a value indicating whether the event handler should be executed.
         /// </summary>
-        /// <param name="event"></param>
-        /// <returns></returns>
+        /// <param name="event">An instance of TEvent representing the event.</param>
+        /// <returns>A value indicating whether the event handler should be executed.</returns>
         bool ShouldHandle(TEvent @event);
     }
 }
