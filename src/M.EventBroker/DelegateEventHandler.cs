@@ -8,8 +8,8 @@ namespace M.EventBroker
     /// <typeparam name="TEvent">The type of the event to be handled.</typeparam>
     public class DelegateEventHandler<TEvent> : IEventHandler<TEvent>
     {
-        private readonly Action<TEvent> handler;
-        private readonly Func<TEvent, bool> filter;
+        private readonly Action<TEvent> _handler;
+        private readonly Func<TEvent, bool> _filter;
 
         /// <summary>
         /// Creates a new instance of the DelegateEventHandler class.
@@ -18,8 +18,8 @@ namespace M.EventBroker
         /// <param name="filter">A delegate used to determine whether the event should be handled.</param>
         public DelegateEventHandler(Action<TEvent> handler, Func<TEvent, bool> filter = null)
         {
-            this.handler = handler;
-            this.filter = filter;
+            _handler = handler;
+            _filter = filter;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace M.EventBroker
         /// <param name="event">An instance of TEvent representing the event.</param>
         public void Handle(TEvent @event)
         {
-            handler(@event);
+            _handler(@event);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace M.EventBroker
         /// <returns>A value indicating whether the event handler should be executed.</returns>
         public bool ShouldHandle(TEvent @event)
         {
-            return filter == null || filter(@event);
+            return _filter == null || _filter(@event);
         }
     }
 }

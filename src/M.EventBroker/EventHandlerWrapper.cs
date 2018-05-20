@@ -4,20 +4,20 @@ namespace M.EventBroker
 {
     internal class EventHandlerWrapper<TEvent> : IEventHandler<TEvent>
     {
-        private readonly IEventHandler<TEvent> eventHandler;
-        private readonly Action<TEvent> handler;
+        private readonly IEventHandler<TEvent> _eventHandler;
+        private readonly Action<TEvent> _handler;
 
         public EventHandlerWrapper(IEventHandler<TEvent> eventHandler)
         {
-            this.eventHandler = eventHandler;
-            handler = eventHandler.Handle;
+            _eventHandler = eventHandler;
+            _handler = eventHandler.Handle;
             IsSubscribed = true;
         }
 
         public EventHandlerWrapper(Action<TEvent> handler, Func<TEvent, bool> filter = null)
         {
-            eventHandler = new DelegateEventHandler<TEvent>(handler, filter);
-            this.handler = handler; 
+            _eventHandler = new DelegateEventHandler<TEvent>(handler, filter);
+            _handler = handler; 
             IsSubscribed = true;
         }
 
@@ -28,22 +28,22 @@ namespace M.EventBroker
 
         public void Handle(TEvent @event)
         {
-            eventHandler.Handle(@event);
+            _eventHandler.Handle(@event);
         }
 
         public bool ShouldHandle(TEvent @event)
         {
-            return eventHandler.ShouldHandle(@event);
+            return _eventHandler.ShouldHandle(@event);
         }
 
         public bool IsWrapping(IEventHandler<TEvent> eventHandler)
         {
-            return this.eventHandler == eventHandler;
+            return _eventHandler == eventHandler;
         }
 
         public bool IsWrapping(Action<TEvent> handler)
         {
-            return this.handler == handler;
+            return _handler == handler;
         }
     }
 }
