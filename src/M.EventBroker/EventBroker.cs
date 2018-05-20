@@ -15,7 +15,7 @@ namespace M.EventBroker
         private readonly BlockingCollection<Action> _handlerActions = new BlockingCollection<Action>();
         private bool _isRunning;
         private readonly Action<Exception> _errorReporter;
-        private readonly Func<Type, IEnumerable<object>> _handlersFactory;
+        private readonly IEventHandlerFactory _handlersFactory;
 
         /// <summary>
         /// Creates a new instance of the EventBroker class.
@@ -26,7 +26,7 @@ namespace M.EventBroker
         public EventBroker(
             int workerThreadsCount,
             Action<Exception> errorReporter = null,
-            Func<Type, IEnumerable<object>> handlersFactory = null)
+            IEventHandlerFactory handlersFactory = null)
         {
             _isRunning = true;
             for (int i = 0; i < workerThreadsCount; i++)
@@ -153,14 +153,14 @@ namespace M.EventBroker
                 return;
             }
 
-            var handlerInstances = _handlersFactory(typeof(TEvent));
+            IEnumerable<IEventHandler<TEvent>> handlerInstances = _handlersFactory.HandlersFor<TEvent>();
             if (handlerInstances == null)
             {
                 return;
             }
-            foreach (var handler in handlerInstances.Cast<IEventHandler<TEvent>>().ToArray())
+            foreach (IEventHandler<TEvent> handler in handlerInstances)
             {
-                var handler1 = handler;
+                IEventHandler<TEvent> handler1 = handler;
                 _handlerActions.Add(() =>
                 {
                     if (!handler1.ShouldHandle(@event))

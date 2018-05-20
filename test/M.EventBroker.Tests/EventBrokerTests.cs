@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using FakeItEasy;
 using Xunit;
@@ -97,8 +98,9 @@ namespace M.EventBroker.Tests
             var handler = A.Fake<IEventHandler<string>>();
             A.CallTo(() => handler.ShouldHandle(A<string>.Ignored))
              .Returns(true);
-            Func<Type, IEnumerable<IEventHandler<string>>> handlersFactory = x => new[] { handler };
-            var broker = new EventBroker(3, null, handlersFactory);
+            var eventHandlersFactory = new EventHandlersFactory();
+            eventHandlersFactory.Add(() => handler);
+            var broker = new EventBroker(3, null, eventHandlersFactory);
 
             broker.Publish("event");
 
@@ -113,8 +115,9 @@ namespace M.EventBroker.Tests
             var handler = A.Fake<IEventHandler<string>>();
             A.CallTo(() => handler.ShouldHandle(A<string>.Ignored))
              .Returns(false);
-            Func<Type, IEnumerable<IEventHandler<string>>> handlersFactory = x => new[] { handler };
-            var broker = new EventBroker(3, null, handlersFactory);
+            var eventHandlersFactory = new EventHandlersFactory();
+            eventHandlersFactory.Add(() => handler);
+            var broker = new EventBroker(3, null, eventHandlersFactory);
 
             broker.Publish("event");
 
@@ -126,7 +129,9 @@ namespace M.EventBroker.Tests
         [Fact]
         public void Publish_WithHandlersReturningNull_NothingHappens()
         {
-           var broker = new EventBroker(1, null, t => null);
+            var eventHandlersFactory = new EventHandlersFactory();
+            eventHandlersFactory.Add<string>(() => null);
+            var broker = new EventBroker(1, null, eventHandlersFactory);
 
             broker.Publish("event");
 
@@ -203,8 +208,9 @@ namespace M.EventBroker.Tests
             var handler = A.Fake<IEventHandler<string>>();
             A.CallTo(() => handler.ShouldHandle(A<string>.Ignored))
              .Returns(true);
-            Func<Type, IEnumerable<IEventHandler<string>>> handlersFactory = x => new[] { handler };
-            var broker = new EventBroker(3, null, handlersFactory);
+            var eventHandlersFactory = new EventHandlersFactory();
+            eventHandlersFactory.Add(() => handler);
+            var broker = new EventBroker(3, null, eventHandlersFactory);
             var stringHandler1 = A.Fake<IEventHandler<string>>();
             A.CallTo(() => stringHandler1.ShouldHandle(A<string>.Ignored))
              .Returns(true);
@@ -236,8 +242,9 @@ namespace M.EventBroker.Tests
             var handler = A.Fake<IEventHandler<string>>();
             A.CallTo(() => handler.ShouldHandle(A<string>.Ignored))
              .Returns(true);
-            Func<Type, IEnumerable<IEventHandler<string>>> handlersFactory = x => new[] { handler };
-            var broker = new EventBroker(1, null, handlersFactory);
+            var eventHandlersFactory = new EventHandlersFactory();
+            eventHandlersFactory.Add(() => handler);
+            var broker = new EventBroker(1, null, eventHandlersFactory);
             var stringHandler1 = A.Fake<IEventHandler<string>>();
             A.CallTo(() => stringHandler1.ShouldHandle(A<string>.Ignored))
              .Returns(true);
@@ -318,6 +325,23 @@ namespace M.EventBroker.Tests
         public interface IErrorReporter
         {
             void Report(Exception exception);
+        }
+
+        public class EventHandlersFactory : IEventHandlerFactory
+        {
+            private readonly List<(Type type, object handler)> _handlers = new List<(Type, object)>();
+
+            public void Add<T>(Func<IEventHandler<T>> handlerProvider)
+            {
+                _handlers.Add((typeof(T), handlerProvider));
+            }
+
+            public IEnumerable<IEventHandler<T>> HandlersFor<T>()
+            {
+                return _handlers.Where(x => x.type == typeof(T))
+                                .Select(x => ((Func<IEventHandler<T>>)x.handler)())
+                                .ToArray();
+            }
         }
     }
 }
