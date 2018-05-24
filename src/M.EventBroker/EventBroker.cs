@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace M.EventBroker
 {
@@ -12,30 +11,18 @@ namespace M.EventBroker
     public class EventBroker : IEventBroker
     {
         private readonly ConcurrentDictionary<Type, List<object>> _subscribers = new ConcurrentDictionary<Type, List<object>>();
-        private readonly BlockingCollection<Action> _handlerActions = new BlockingCollection<Action>();
-        private bool _isRunning;
         private readonly Action<Exception> _errorReporter;
         private readonly IEventHandlerFactory _handlersFactory;
+        private readonly IEventHandlerRunner _runner;
 
         /// <summary>
         /// Creates a new instance of the EventBroker class.
         /// </summary>
-        /// <param name="workerThreadsCount">Determines how many threads to use for calling event handlers.</param>
-        /// <param name="errorReporter">A delegate to be called when exception is thrown from handler.</param>
+        /// <param name="runner"></param>
         /// <param name="handlersFactory">A delegate providing event handlers for event of givent type.</param>
-        public EventBroker(
-            int workerThreadsCount,
-            Action<Exception> errorReporter = null,
-            IEventHandlerFactory handlersFactory = null)
+        public EventBroker(IEventHandlerRunner runner, IEventHandlerFactory handlersFactory = null)
         {
-            _isRunning = true;
-            for (int i = 0; i < workerThreadsCount; i++)
-            {
-                Thread thread = new Thread(new ThreadStart(Worker));
-                thread.Start();
-            }
-
-            _errorReporter = errorReporter;
+            _runner = runner;
             _handlersFactory = handlersFactory;
         }
 
@@ -96,16 +83,7 @@ namespace M.EventBroker
         /// <summary>
         /// Releases all resources used by the current instance of the EventBroker class.
         /// </summary>
-        public void Dispose()
-        {
-            if (_isRunning)
-            {
-                _isRunning = false;
-                Thread.Sleep(1000);
-            }
-
-            _handlerActions.Dispose();
-        }
+        public void Dispose() => _runner.Dispose();
 
         private void Unsubscribe<TEvent>(Func<EventHandlerWrapper<TEvent>, bool> handlerPredicate)
         {
@@ -126,24 +104,30 @@ namespace M.EventBroker
                 return;
             }
 
-            foreach (var handler in handlers.Cast<EventHandlerWrapper<TEvent>>().ToArray())
+            Action CreateHandlerAction(EventHandlerWrapper<TEvent> handler)
             {
-                var handler1 = handler;
-                _handlerActions.Add(() =>
+                return () =>
                 {
-                    if (!handler1.IsSubscribed)
+                    if (!handler.IsSubscribed)
                     {
                         return;
                     }
 
-                    if (!handler1.ShouldHandle(@event))
+                    if (!handler.ShouldHandle(@event))
                     {
                         return;
                     }
 
-                    handler1.Handle(@event);
-                });
+                    handler.Handle(@event);
+                };
             }
+
+            Action[] handlerActions =
+                handlers.Cast<EventHandlerWrapper<TEvent>>()
+                        .Select(CreateHandlerAction)
+                        .ToArray();
+
+            _runner.Run(handlerActions);
         }
 
         private void EnqueueFromHandlersFactory<TEvent>(TEvent @event)
@@ -158,40 +142,23 @@ namespace M.EventBroker
             {
                 return;
             }
-            foreach (IEventHandler<TEvent> handler in handlerInstances)
+
+            Action CreateHandlerAction(IEventHandler<TEvent> handler)
             {
-                IEventHandler<TEvent> handler1 = handler;
-                _handlerActions.Add(() =>
+                return () =>
                 {
-                    if (!handler1.ShouldHandle(@event))
+                    if (!handler.ShouldHandle(@event))
                     {
                         return;
                     }
 
-                    handler1.Handle(@event);
-                });
+                    handler.Handle(@event);
+                };
             }
-        }
 
-        private void Worker()
-        {
-            int timeout = (int)TimeSpan.FromSeconds(1).TotalMilliseconds;
-            while (_isRunning)
-            {
-                if (!_handlerActions.TryTake(out Action action, timeout))
-                {
-                    continue;
-                }
+            Action[] handlerActions = handlerInstances.Select(CreateHandlerAction).ToArray();
 
-                try
-                {
-                    action();
-                }
-                catch (Exception ex)
-                {
-                    _errorReporter?.Invoke(ex);
-                }
-            }
+            _runner.Run(handlerActions);
         }
     }
 }
