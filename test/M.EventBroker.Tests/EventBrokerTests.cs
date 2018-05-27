@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Xunit;
 
@@ -415,9 +417,38 @@ namespace M.EventBroker.Tests
              .MustHaveHappened(Repeated.Exactly.Once);
         }
 
-        public interface IErrorReporter
+        [Fact]
+        public void Publish_WithDelegateSubscriptionUnsubscribedWhileWaiting_HandlerIsNotCalled()
         {
-            void Report(Exception exception);
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+            
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x =>
+             {
+                 Task.Factory.StartNew(() =>
+                 {
+                     Thread.Sleep(500);
+                     ((Action[])x.Arguments.First()).First().Invoke();
+                 });
+             });
+
+            var broker = new EventBroker(handlerRunnerMock);
+            broker.Subscribe<string>(handlerMock.Handle);
+
+            // Act
+            broker.Publish("event");
+            broker.Unsubscribe<string>(handlerMock.Handle);
+
+            // Assert
+            Thread.Sleep(500);
+            A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
+             .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => handlerMock.Handle("event"))
+             .MustNotHaveHappened();
         }
 
         public class EventHandlersFactory : IEventHandlerFactory
