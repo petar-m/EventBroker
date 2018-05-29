@@ -1,7 +1,7 @@
 $dotnet='"C:/Program Files/dotnet/dotnet.exe"'  
 $userFolder=[System.Environment]::GetFolderPath('UserProfile')
 $opencover= Join-Path -Path $userFolder -ChildPath  ".nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe"  
-$reportgenerator= Join-Path -Path $userFolder -ChildPath ".nuget\packages\ReportGenerator\3.0.2\tools\ReportGenerator.exe"
+$reportgenerator= Join-Path -Path $userFolder -ChildPath ".nuget\packages\ReportGenerator\3.1.2\tools\ReportGenerator.exe"
 
 $targetargs='"test -f netcoreapp2.0"'
 $filter='"+[*]M.EventBroker.* -[*.Tests]* -[xunit.*]* -[FakeItEasy*]*"'
