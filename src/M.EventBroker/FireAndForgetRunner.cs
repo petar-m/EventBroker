@@ -4,24 +4,24 @@ using System.Threading;
 
 namespace M.EventBroker
 {
-    public class EventHandlerRunner : IEventHandlerRunner
+    public class FireAndForgetRunner : IEventHandlerRunner
     {
-        private readonly TimeSpan timeout = TimeSpan.FromSeconds(1);
+        private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1);
         private readonly BlockingCollection<Action> _handlerActions = new BlockingCollection<Action>();
+        private readonly IErrorReporter _errorReporter;
         private bool _isRunning;
-        private readonly Action<Exception> _errorReporter;
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="workerThreadsCount">Determines how many threads to use for calling event handlers.</param>
-        public EventHandlerRunner(int workerThreadsCount, Action<Exception> errorReporter = null)
+        public FireAndForgetRunner(int workerThreadsCount, IErrorReporter errorReporter = null)
         {
             _errorReporter = errorReporter;
             _isRunning = true;
             for (int i = 0; i < workerThreadsCount; i++)
             {
-                Thread thread = new Thread(new ThreadStart(Worker));
+                Thread thread = new Thread(Worker);
                 thread.Start();
             }
         }
@@ -40,7 +40,7 @@ namespace M.EventBroker
             if (_isRunning)
             {
                 _isRunning = false;
-                Thread.Sleep(timeout);
+                Thread.Sleep(_timeout);
             }
 
             _handlerActions.Dispose();
@@ -50,7 +50,7 @@ namespace M.EventBroker
         {
             while (_isRunning)
             {
-                if (!_handlerActions.TryTake(out Action action, timeout))
+                if (!_handlerActions.TryTake(out Action action, _timeout))
                 {
                     continue;
                 }
@@ -61,7 +61,7 @@ namespace M.EventBroker
                 }
                 catch (Exception ex)
                 {
-                    _errorReporter?.Invoke(ex);
+                    _errorReporter?.Report(ex);
                 }
             }
         }
