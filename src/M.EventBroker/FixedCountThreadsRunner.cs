@@ -21,6 +21,7 @@ namespace M.EventBroker
         /// <param name="errorReporter">Represents an error reporting logic to be called if exception is thrown from event handler.</param>
         public FixedCountThreadsRunner(int workerThreadsCount, IErrorReporter errorReporter = null)
         {
+            workerThreadsCount = workerThreadsCount > 0 ? workerThreadsCount : throw new ArgumentOutOfRangeException($"Parameter {nameof(workerThreadsCount)} should be positive integer (value was: {workerThreadsCount})");
             _errorReporter = errorReporter;
             _isRunning = true;
             for (int i = 0; i < workerThreadsCount; i++)

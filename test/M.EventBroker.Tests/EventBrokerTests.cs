@@ -268,7 +268,7 @@ namespace M.EventBroker.Tests
             // Arrange
             var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
             var broker = new EventBroker(handlerRunnerMock);
-                      
+
             // Act
             broker.Dispose();
 
@@ -282,7 +282,7 @@ namespace M.EventBroker.Tests
         {
             // Arrange
             var handlerMock = A.Fake<IEventHandler<string>>();
-            
+
             var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
             A.CallTo(() => handlerRunnerMock.Run(null))
              .WithAnyArguments()
