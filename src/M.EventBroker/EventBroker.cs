@@ -11,7 +11,6 @@ namespace M.EventBroker
     public class EventBroker : IEventBroker
     {
         private readonly ConcurrentDictionary<Type, List<object>> _subscribers = new ConcurrentDictionary<Type, List<object>>();
-        private readonly Action<Exception> _errorReporter;
         private readonly IEventHandlerFactory _handlersFactory;
         private readonly IEventHandlerRunner _runner;
 

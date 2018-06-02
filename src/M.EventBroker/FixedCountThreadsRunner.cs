@@ -4,18 +4,22 @@ using System.Threading;
 
 namespace M.EventBroker
 {
-    public class FireAndForgetRunner : IEventHandlerRunner
+    /// <summary>
+    /// Runs event handlers on fixed count background threads.
+    /// </summary>
+    public class FixedCountThreadsRunner : IEventHandlerRunner
     {
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1);
         private readonly BlockingCollection<Action> _handlerActions = new BlockingCollection<Action>();
         private readonly IErrorReporter _errorReporter;
         private bool _isRunning;
-        
+
         /// <summary>
-        /// 
+        /// Creates a new instance of the FixedCountThreadsRunner class.
         /// </summary>
-        /// <param name="workerThreadsCount">Determines how many threads to use for calling event handlers.</param>
-        public FireAndForgetRunner(int workerThreadsCount, IErrorReporter errorReporter = null)
+        /// <param name="workerThreadsCount">Specifies the count of threads to use for running event handlers. Threads are created and stared in the constructor.</param>
+        /// <param name="errorReporter">Represents an error reporting logic to be called if exception is thrown from event handler.</param>
+        public FixedCountThreadsRunner(int workerThreadsCount, IErrorReporter errorReporter = null)
         {
             _errorReporter = errorReporter;
             _isRunning = true;
@@ -26,6 +30,10 @@ namespace M.EventBroker
             }
         }
 
+        /// <summary>
+        /// Runs events handlers on available backgrround thread.
+        /// </summary>
+        /// <param name="handlers">The event handlers to run.</param>
         public void Run(params Action[] handlers)
         {
             foreach (var handler in handlers)
@@ -34,7 +42,9 @@ namespace M.EventBroker
             }
         }
 
-        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             if (_isRunning)

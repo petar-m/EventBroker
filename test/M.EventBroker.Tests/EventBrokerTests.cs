@@ -87,30 +87,8 @@ namespace M.EventBroker.Tests
              .MustNotHaveHappened();
         }
 
-        //[Fact]
-        //public void Unsubscribe_WhileWaiting_RemovesSubscribsion()
-        //{
-        //    var broker = new EventBroker(1);
-        //    var handler1 = A.Fake<IEventHandler<int>>();
-        //    A.CallTo(() => handler1.Handle(A<int>.Ignored))
-        //     .Invokes(() => Thread.Sleep(100));
-        //    var handler2 = A.Fake<IEventHandler<int>>();
-        //    broker.Subscribe<int>(handler1.Handle);
-        //    broker.Subscribe<int>(handler2.Handle);
-
-        //    broker.Publish(1);
-        //    broker.Unsubscribe<int>(handler2.Handle);
-
-        //    Thread.Sleep(100);
-        //    A.CallTo(() => handler1.Handle(1))
-        //     .MustHaveHappened(Repeated.Exactly.Once);
-
-        //    A.CallTo(() => handler2.Handle(A<int>.Ignored))
-        //     .MustNotHaveHappened();
-        //}
-
         [Fact]
-        public void Publish_WithHandlersFactory_HandlerIsCalled()
+        public void Publish_WithHandlersFactory_HandlerIsRunned()
         {
             // Arrange
             var handlerMock = A.Fake<IEventHandler<string>>();
@@ -238,40 +216,8 @@ namespace M.EventBroker.Tests
              .MustNotHaveHappened();
         }
 
-        //[Fact]
-        //public void Publish_HandlerThrowsExceptionWithoutErrorReporter_ExceptionIsMuted()
-        //{
-        //    var handler = A.Fake<IEventHandler<string>>();
-        //    A.CallTo(() => handler.Handle(A<string>.Ignored))
-        //     .Throws(new InvalidOperationException());
-        //    var broker = new EventBroker(3);
-        //    broker.Subscribe<string>(handler.Handle);
-
-        //    broker.Publish("event");
-
-        //    Thread.Sleep(100);
-        //    Assert.True(true);
-        //}
-
-        //[Fact]
-        //public void Publish_HandlerThrowsExceptionWithErrorReporter_ExceptionIsReported()
-        //{
-        //    var handler = A.Fake<IEventHandler<string>>();
-        //    A.CallTo(() => handler.Handle(A<string>.Ignored))
-        //     .Throws(new InvalidOperationException("something happened"));
-        //    var errorReporter = A.Fake<IErrorReporter>();
-        //    var broker = new EventBroker(3, errorReporter.Report);
-        //    broker.Subscribe<string>(handler.Handle);
-
-        //    broker.Publish("event");
-
-        //    Thread.Sleep(100);
-        //    A.CallTo(() => errorReporter.Report(A<InvalidOperationException>.That.Matches(x => x.Message == "something happened")))
-        //     .MustHaveHappened(Repeated.Exactly.Once);
-        //}
-
         [Fact]
-        public void Publish_WithMultipleSubscribers_AllHandlersAreCalled()
+        public void Publish_WithMultipleSubscribers_AllHandlersAreRunned()
         {
             // Arrange
             var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
@@ -332,7 +278,7 @@ namespace M.EventBroker.Tests
         }
 
         [Fact]
-        public void Publish_WithDelegateSubscriptionUnsubscribedWhileWaiting_HandlerIsNotCalled()
+        public void Publish_WithDelegateSubscriptionUnsubscribedWhileWaiting_HandlerIsNotRunned()
         {
             // Arrange
             var handlerMock = A.Fake<IEventHandler<string>>();
