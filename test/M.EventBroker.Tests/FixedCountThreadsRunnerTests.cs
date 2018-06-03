@@ -24,8 +24,13 @@ namespace M.EventBroker.Tests
 
             // Assert
             Thread.Sleep(100);
+
             Assert.NotNull(thread1);
+            Assert.NotEqual(Thread.CurrentThread.ManagedThreadId, thread1);
+
             Assert.NotNull(thread2);
+            Assert.NotEqual(Thread.CurrentThread.ManagedThreadId, thread2);
+
             Assert.NotEqual(thread1, thread2);
         }
 
