@@ -1,4 +1,6 @@
-﻿namespace M.EventBroker
+﻿using System;
+
+namespace M.EventBroker
 {
     /// <summary>
     /// Represents a logic for handling events.
@@ -18,5 +20,12 @@
         /// <param name="event">An instance of TEvent representing the event.</param>
         /// <returns>A value indicating whether the event handler should be executed.</returns>
         bool ShouldHandle(TEvent @event);
+
+        /// <summary>
+        /// Called when an error is caught during execution.
+        /// </summary>
+        /// <param name="exception">The exception caught.</param>
+        /// <param name="event">The event instance which handling caused the exception.</param>
+        void OnError(Exception exception, TEvent @event);
     }
 }

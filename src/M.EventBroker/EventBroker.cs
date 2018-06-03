@@ -31,10 +31,11 @@ namespace M.EventBroker
         /// <typeparam name="TEvent">The type of the event.</typeparam>
         /// <param name="handler">A delegate that will be invoked when event is published.</param>
         /// <param name="filter">A delegate used to perform filtering of events before invoking the handler.</param>
-        public void Subscribe<TEvent>(Action<TEvent> handler, Func<TEvent, bool> filter = null)
+        /// <param name="onError">A delegate called when an error is caught during execution.</param>
+        public void Subscribe<TEvent>(Action<TEvent> handler, Func<TEvent, bool> filter = null, Action<Exception, TEvent> onError = null)
         {
             var handlers = _subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
-            handlers.Add(new EventHandlerWrapper<TEvent>(handler, filter));
+            handlers.Add(new EventHandlerWrapper<TEvent>(handler, filter, onError));
         }
 
         /// <summary>
@@ -112,12 +113,7 @@ namespace M.EventBroker
                         return;
                     }
 
-                    if (!handler.ShouldHandle(@event))
-                    {
-                        return;
-                    }
-
-                    handler.Handle(@event);
+                    TryRunHandler(handler, @event);
                 };
             }
 
@@ -144,20 +140,41 @@ namespace M.EventBroker
 
             Action CreateHandlerAction(IEventHandler<TEvent> handler)
             {
-                return () =>
-                {
-                    if (!handler.ShouldHandle(@event))
-                    {
-                        return;
-                    }
-
-                    handler.Handle(@event);
-                };
+                return () => TryRunHandler(handler, @event);
             }
 
             Action[] handlerActions = handlerInstances.Select(CreateHandlerAction).ToArray();
 
             _runner.Run(handlerActions);
+        }
+
+        private void TryRunHandler<TEvent>(IEventHandler<TEvent> handler, TEvent @event)
+        {
+            try
+            {
+                if (!handler.ShouldHandle(@event))
+                {
+                    return;
+                }
+
+                handler.Handle(@event);
+            }
+            catch (Exception exception)
+            {
+                TryReportError(exception, handler, @event);
+            }
+        }
+
+        private void TryReportError<TEvent>(Exception exception, IEventHandler<TEvent> handler, TEvent @event)
+        {
+            try
+            {
+                handler.OnError(exception, @event);
+            }
+            catch
+            {
+                // yes, we mute exceptions here
+            }
         }
     }
 }

@@ -8,19 +8,19 @@ namespace M.EventBroker.Tests
     public class FixedCountThreadsRunnerTests
     {
         [Fact]
-        public void Publish_WithMultipleSubscribersAndMultipleWorkers_HandlersAreRunnedOnDifferentThreads()
+        public void Run_WithMultipleActionsAndMultipleWorkers_ActionsAreRunnedOnDifferentThreads()
         {
             // Arrange
             int? thread1 = null;
-            Action handler1 = () => { thread1 = Thread.CurrentThread.ManagedThreadId; Thread.Sleep(30); };
+            Action action1 = () => { thread1 = Thread.CurrentThread.ManagedThreadId; Thread.Sleep(30); };
 
             int? thread2 = null;
-            Action handler2 = () => { thread2 = Thread.CurrentThread.ManagedThreadId; Thread.Sleep(30); };
+            Action action2 = () => { thread2 = Thread.CurrentThread.ManagedThreadId; Thread.Sleep(30); };
 
             var runner = new FixedCountThreadsRunner(2);
 
             // Act
-            runner.Run(handler1, handler2);
+            runner.Run(action1, action2);
 
             // Assert
             Thread.Sleep(100);
@@ -30,63 +30,28 @@ namespace M.EventBroker.Tests
         }
 
         [Fact]
-        public void Publish_WithMultipleSubscribersAndSingleWorker_AllHandlersAreRunned()
+        public void Run_WithMultipleSubscribersAndSingleWorker_AllActionsAreRunned()
         {
             // Arrange
-            var handler1 = A.Fake<IAction>();
-            var handler2 = A.Fake<IAction>();
-            var handler3 = A.Fake<IAction>();
+            var action1 = A.Fake<IAction>();
+            var action2 = A.Fake<IAction>();
+            var action3 = A.Fake<IAction>();
 
             var runner = new FixedCountThreadsRunner(1);
 
             // Act
-            runner.Run(handler1.Action, handler2.Action, handler3.Action);
+            runner.Run(action1.Action, action2.Action, action3.Action);
 
             // Assert
             Thread.Sleep(100);
-            A.CallTo(() => handler1.Action())
+            A.CallTo(() => action1.Action())
              .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => handler2.Action())
+            A.CallTo(() => action2.Action())
              .MustHaveHappened(Repeated.Exactly.Once);
 
-            A.CallTo(() => handler3.Action())
+            A.CallTo(() => action3.Action())
              .MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        [Fact]
-        public void ErrorReporter_OnException_ExceptionIsReported()
-        {
-            // Arrange
-            var exception = new InvalidOperationException("exception during execution");
-            Action handler = () => throw exception;
-
-            var errorReporterMock = A.Fake<IErrorReporter>();
-
-            var runner = new FixedCountThreadsRunner(1, errorReporterMock);
-
-            // Act 
-            runner.Run(handler);
-
-            // Assert
-            Thread.Sleep(50);
-            A.CallTo(() => errorReporterMock.Report(exception))
-             .MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        [Fact]
-        public void NoErrorReporter_OnException_ExceptionIsSwallowed()
-        {
-            // Arrange
-            Action handler = () => throw new Exception();
-            var runner = new FixedCountThreadsRunner(1);
-
-            // Act 
-            runner.Run(handler);
-
-            // Assert
-            Thread.Sleep(50);
-            Assert.True(true);
         }
 
         [Fact]

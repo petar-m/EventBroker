@@ -13,7 +13,8 @@ namespace M.EventBroker
         /// <typeparam name="TEvent">The type of the event.</typeparam>
         /// <param name="handler">A delegate that will be invoked when event is published.</param>
         /// <param name="filter">A delegate used to perform filtering of events before invoking the handler.</param>
-        void Subscribe<TEvent>(Action<TEvent> handler, Func<TEvent, bool> filter = null);
+        /// <param name="onError">Called when an error is caught during execution.</param>
+        void Subscribe<TEvent>(Action<TEvent> handler, Func<TEvent, bool> filter = null, Action<Exception, TEvent> onError = null);
 
         /// <summary>
         /// Adds subscription for events of type <typeparamref name="TEvent"/>.

@@ -311,6 +311,218 @@ namespace M.EventBroker.Tests
              .MustNotHaveHappened();
         }
 
+        [Fact]
+        public void SubscribedWithOnErrorDelegate_ExceptionThrownDuringHandling_OnExceptionIsCalled()
+        {
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+
+            A.CallTo(() => handlerMock.ShouldHandle(A<string>.Ignored))
+             .Returns(true);
+
+            A.CallTo(() => handlerMock.Handle(A<string>.Ignored))
+             .Throws<Exception>();
+
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x => ((Action[])x.Arguments.First())[0].Invoke());
+
+            var broker = new EventBroker(handlerRunnerMock);
+            broker.Subscribe<string>(handlerMock.Handle, handlerMock.ShouldHandle, handlerMock.OnError);
+
+            // Act
+            broker.Publish("event");
+
+            // Assert
+            A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, "event"))
+             .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void SubscribedWithoutOnErrorDelegate_ExceptionThrownDuringHandling_ExceptionIsMuted()
+        {
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+
+            A.CallTo(() => handlerMock.ShouldHandle(A<string>.Ignored))
+             .Returns(true);
+
+            A.CallTo(() => handlerMock.Handle(A<string>.Ignored))
+             .Throws<Exception>();
+
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x => ((Action[])x.Arguments.First())[0].Invoke());
+
+            var broker = new EventBroker(handlerRunnerMock);
+            broker.Subscribe<string>(handlerMock.Handle, handlerMock.ShouldHandle, null);
+
+            // Act
+            broker.Publish("event");
+
+            // Assert
+            Assert.True(true);
+        }
+
+        [Fact]
+        public void SubscribedWithOnErrorDelegate_ExceptionThrownDuringOnError_ExceptionIsMuted()
+        {
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+
+            A.CallTo(() => handlerMock.ShouldHandle(A<string>.Ignored))
+             .Returns(true);
+
+            A.CallTo(() => handlerMock.Handle(A<string>.Ignored))
+             .Throws<Exception>();
+
+            A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, A<string>.Ignored))
+             .Throws<Exception>();
+
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x => ((Action[])x.Arguments.First())[0].Invoke());
+
+            var broker = new EventBroker(handlerRunnerMock);
+            broker.Subscribe<string>(handlerMock.Handle, handlerMock.ShouldHandle, handlerMock.OnError);
+
+            // Act
+            broker.Publish("event");
+
+            // Assert
+            Assert.True(true);
+        }
+
+        [Fact]
+        public void SubscribedWithHandlerInstancee_ExceptionThrownDuringHandling_OnExceptionIsCalled()
+        {
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+
+            A.CallTo(() => handlerMock.ShouldHandle(A<string>.Ignored))
+             .Returns(true);
+
+            A.CallTo(() => handlerMock.Handle(A<string>.Ignored))
+             .Throws<Exception>();
+
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x => ((Action[])x.Arguments.First())[0].Invoke());
+
+            var broker = new EventBroker(handlerRunnerMock);
+            broker.Subscribe(handlerMock);
+
+            // Act
+            broker.Publish("event");
+
+            // Assert
+            A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, "event"))
+             .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void SubscribedWithHandlerInstance_ExceptionThrownDuringOnError_ExceptionIsMuted()
+        {
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+
+            A.CallTo(() => handlerMock.ShouldHandle(A<string>.Ignored))
+             .Returns(true);
+
+            A.CallTo(() => handlerMock.Handle(A<string>.Ignored))
+             .Throws<Exception>();
+
+            A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, A<string>.Ignored))
+             .Throws<Exception>();
+
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x => ((Action[])x.Arguments.First())[0].Invoke());
+
+            var broker = new EventBroker(handlerRunnerMock);
+            broker.Subscribe(handlerMock);
+
+            // Act
+            broker.Publish("event");
+
+            // Assert
+            Assert.True(true);
+        }
+
+        [Fact]
+        public void SubscribedWithHandlersFactory_ExceptionThrownDuringHandling_OnExceptionIsCalled()
+        {
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+
+            A.CallTo(() => handlerMock.ShouldHandle(A<string>.Ignored))
+             .Returns(true);
+
+            A.CallTo(() => handlerMock.Handle(A<string>.Ignored))
+             .Throws<Exception>();
+
+            var eventHandlersFactory = new EventHandlersFactory();
+            eventHandlersFactory.Add(() => handlerMock);
+
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x => ((Action[])x.Arguments.First())[0].Invoke());
+
+            var broker = new EventBroker(handlerRunnerMock, eventHandlersFactory);
+
+            // Act
+            broker.Publish("event");
+
+            // Assert
+            A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, "event"))
+             .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public void SubscribedWithHandlersFactory_ExceptionThrownDuringOnError_ExceptionIsMuted()
+        {
+            // Arrange
+            var handlerMock = A.Fake<IEventHandler<string>>();
+
+            A.CallTo(() => handlerMock.ShouldHandle(A<string>.Ignored))
+             .Returns(true);
+
+            A.CallTo(() => handlerMock.Handle(A<string>.Ignored))
+             .Throws<Exception>();
+
+            A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, A<string>.Ignored))
+             .Throws<Exception>();
+
+            var eventHandlersFactory = new EventHandlersFactory();
+            eventHandlersFactory.Add(() => handlerMock);
+
+            var handlerRunnerMock = A.Fake<IEventHandlerRunner>();
+
+            A.CallTo(() => handlerRunnerMock.Run(null))
+             .WithAnyArguments()
+             .Invokes(x => ((Action[])x.Arguments.First())[0].Invoke());
+
+            var broker = new EventBroker(handlerRunnerMock, eventHandlersFactory);
+
+            // Act
+            broker.Publish("event");
+
+            // Assert
+            Assert.True(true);
+        }
+
         public class EventHandlersFactory : IEventHandlerFactory
         {
             readonly List<(Type type, object handler)> _handlers = new List<(Type, object)>();
@@ -322,7 +534,7 @@ namespace M.EventBroker.Tests
 
             public IEnumerable<IEventHandler<T>> HandlersFor<T>()
             {
-                return _handlers.Any()
+                return _handlers.Count > 0
                         ? _handlers.Where(x => x.type == typeof(T))
                                  .Select(x => ((Func<IEventHandler<T>>)x.handler)())
                                  .ToArray()

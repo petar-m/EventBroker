@@ -6,7 +6,7 @@ namespace M.EventBroker
     {
         private readonly IEventHandler<TEvent> _eventHandler;
         private readonly Action<TEvent> _handler;
-
+        
         public EventHandlerWrapper(IEventHandler<TEvent> eventHandler)
         {
             _eventHandler = eventHandler;
@@ -14,10 +14,10 @@ namespace M.EventBroker
             IsSubscribed = true;
         }
 
-        public EventHandlerWrapper(Action<TEvent> handler, Func<TEvent, bool> filter = null)
+        public EventHandlerWrapper(Action<TEvent> handler, Func<TEvent, bool> filter = null, Action<Exception, TEvent> onError = null)
         {
-            _eventHandler = new DelegateEventHandler<TEvent>(handler, filter);
-            _handler = handler; 
+            _eventHandler = new DelegateEventHandler<TEvent>(handler, filter, onError);
+            _handler = handler;
             IsSubscribed = true;
         }
 
@@ -34,6 +34,11 @@ namespace M.EventBroker
         public bool ShouldHandle(TEvent @event)
         {
             return _eventHandler.ShouldHandle(@event);
+        }
+
+        public void OnError(Exception exception, TEvent @event)
+        {
+            _eventHandler.OnError(exception, @event);
         }
 
         public bool IsWrapping(IEventHandler<TEvent> eventHandler)

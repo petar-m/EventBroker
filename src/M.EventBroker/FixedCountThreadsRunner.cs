@@ -11,18 +11,15 @@ namespace M.EventBroker
     {
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1);
         private readonly BlockingCollection<Action> _handlerActions = new BlockingCollection<Action>();
-        private readonly IErrorReporter _errorReporter;
         private bool _isRunning;
 
         /// <summary>
         /// Creates a new instance of the FixedCountThreadsRunner class.
         /// </summary>
         /// <param name="workerThreadsCount">Specifies the count of threads to use for running event handlers. Threads are created and stared in the constructor.</param>
-        /// <param name="errorReporter">Represents an error reporting logic to be called if exception is thrown from event handler.</param>
-        public FixedCountThreadsRunner(int workerThreadsCount, IErrorReporter errorReporter = null)
+        public FixedCountThreadsRunner(int workerThreadsCount)
         {
             workerThreadsCount = workerThreadsCount > 0 ? workerThreadsCount : throw new ArgumentOutOfRangeException($"Parameter {nameof(workerThreadsCount)} should be positive integer (value was: {workerThreadsCount})");
-            _errorReporter = errorReporter;
             _isRunning = true;
             for (int i = 0; i < workerThreadsCount; i++)
             {
@@ -66,14 +63,7 @@ namespace M.EventBroker
                     continue;
                 }
 
-                try
-                {
-                    action();
-                }
-                catch (Exception ex)
-                {
-                    _errorReporter?.Report(ex);
-                }
+                action();
             }
         }
     }
