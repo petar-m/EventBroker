@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace M.EventBroker
 {
@@ -12,5 +13,7 @@ namespace M.EventBroker
         /// </summary>
         /// <param name="handlers">The event handlers to run.</param>
         void Run(params Action[] handlers);
+
+        Task RunAsync(params Func<Task>[] handlers);
     }
 }

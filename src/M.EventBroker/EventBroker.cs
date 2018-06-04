@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace M.EventBroker
 {
@@ -38,6 +39,11 @@ namespace M.EventBroker
             handlers.Add(new EventHandlerWrapper<TEvent>(handler, filter, onError));
         }
 
+        public void SubscribeAsync<TEvent>(Func<TEvent, Task> handler, Func<TEvent, Task<bool>> filter = null, Func<Exception, TEvent, Task> onError = null)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Adds subscription for events of type <typeparamref name="TEvent"/>.
         /// </summary>
@@ -47,6 +53,11 @@ namespace M.EventBroker
         {
             var handlers = _subscribers.GetOrAdd(typeof(TEvent), _ => new List<object>());
             handlers.Add(new EventHandlerWrapper<TEvent>(handler));
+        }
+
+        public void SubscribeAsync<TEvent>(IEventHandlerAsync<TEvent> handler)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -59,6 +70,11 @@ namespace M.EventBroker
             Unsubscribe<TEvent>(x => x.IsWrapping(handler));
         }
 
+        public void UnsubscribeAsync<TEvent>(Func<TEvent, Task> handler)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Removes subscription for events of type <typeparamref name="TEvent"/>.
         /// </summary>
@@ -67,6 +83,11 @@ namespace M.EventBroker
         public void Unsubscribe<TEvent>(IEventHandler<TEvent> handler)
         {
             Unsubscribe<TEvent>(x => x.IsWrapping(handler));
+        }
+
+        public void UnsubscribeAsync<TEvent>(IEventHandlerAsync<TEvent> handler)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -78,6 +99,11 @@ namespace M.EventBroker
         {
             EnqueueSubscribers(@event);
             EnqueueFromHandlersFactory(@event);
+        }
+
+        public async Task PublishAsync<TEvent>(TEvent @event)
+        {
+            return;
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace M.EventBroker
 {
@@ -38,6 +39,11 @@ namespace M.EventBroker
             {
                 _handlerActions.Add(handler);
             }
+        }
+
+        public Task RunAsync(params Func<Task>[] handlers)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
