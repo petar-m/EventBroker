@@ -25,14 +25,5 @@ namespace M.EventBroker
         public void Dispose()
         {
         }
-
-        public async Task RunAsync(params Func<Task>[] handlers)
-        {
-            foreach (Func<Task> handler in handlers)
-            {
-                var handler1 = handler;
-                Task.Run(handler1);
-            }
-        }
     }
 }
