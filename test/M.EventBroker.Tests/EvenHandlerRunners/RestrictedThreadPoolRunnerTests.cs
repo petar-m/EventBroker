@@ -99,7 +99,7 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
             Thread.Sleep(1000);
 
             A.CallTo(() => action1.Action())
-            .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => action2.Action())
              .MustNotHaveHappened();
@@ -110,20 +110,21 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
         {
             // Arrange
             var action1 = A.Fake<IAction>();
-            A.CallTo(() => action1.Action()).Invokes(() => Thread.Sleep(200));
+            A.CallTo(() => action1.Action()).Invokes(() => Thread.Sleep(1000));
 
             // Act
             using (var runner = new RestrictedThreadPoolRunner(1))
             {
                 runner.Run(action1.Action);
+                Thread.Sleep(100);
                 runner.Dispose();
             }
 
             // Assert
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
 
             A.CallTo(() => action1.Action())
-                .MustNotHaveHappened();
+             .MustHaveHappenedOnceExactly();
         }
     }
 }
