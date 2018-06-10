@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace M.EventBroker
+namespace M.EventBroker.EvenHandlerRunners
 {
     /// <summary>
     /// Runs event handlers on fixed count background threads.

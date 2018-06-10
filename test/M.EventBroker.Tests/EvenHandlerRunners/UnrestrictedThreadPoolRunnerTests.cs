@@ -1,8 +1,9 @@
-﻿using System;
+﻿using M.EventBroker.EvenHandlerRunners;
+using System;
 using System.Threading;
 using Xunit;
 
-namespace M.EventBroker.Tests
+namespace M.EventBroker.Tests.EvenHandlerRunners
 {
     public class UnrestrictedThreadPoolRunnerTests
     {

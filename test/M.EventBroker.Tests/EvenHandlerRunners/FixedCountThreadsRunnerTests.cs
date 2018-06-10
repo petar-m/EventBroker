@@ -1,9 +1,10 @@
-﻿using System;
+﻿using FakeItEasy;
+using M.EventBroker.EvenHandlerRunners;
+using System;
 using System.Threading;
-using FakeItEasy;
 using Xunit;
 
-namespace M.EventBroker.Tests
+namespace M.EventBroker.Tests.EvenHandlerRunners
 {
     public class FixedCountThreadsRunnerTests
     {
@@ -80,23 +81,17 @@ namespace M.EventBroker.Tests
             var action1 = A.Fake<IAction>();
             A.CallTo(() => action1.Action()).Invokes(() => Thread.Sleep(200));
 
-            var action2 = A.Fake<IAction>();
-            A.CallTo(() => action2.Action()).Invokes(() => Thread.Sleep(200));
-
             // Act
             using (var runner = new FixedCountThreadsRunner(1))
             {
-                runner.Run(action1.Action, action2.Action);
+                runner.Run(action1.Action);
             }
 
             // Assert
             Thread.Sleep(1000);
 
             A.CallTo(() => action1.Action())
-            .MustHaveHappened(Repeated.Exactly.Once);
-
-            A.CallTo(() => action2.Action())
-             .MustNotHaveHappened();
+            .MustNotHaveHappened();
         }
 
         [Fact]
@@ -117,7 +112,7 @@ namespace M.EventBroker.Tests
             Thread.Sleep(1000);
 
             A.CallTo(() => action1.Action())
-                .MustNotHaveHappened();
+                .MustHaveHappenedOnceExactly();
         }
     }
 }

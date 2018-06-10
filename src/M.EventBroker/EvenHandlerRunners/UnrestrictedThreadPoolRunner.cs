@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace M.EventBroker
+namespace M.EventBroker.EvenHandlerRunners
 {
     /// <summary>
     /// Runs event handlers on a ThreadPool threads.

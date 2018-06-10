@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace M.EventBroker
+namespace M.EventBroker.EvenHandlerRunners
 {
     /// <summary>
     /// Runs event handlers on a ThreadPool threads, restricting the running handlers to a given number.
