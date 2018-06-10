@@ -1,14 +1,14 @@
-﻿using System;
+﻿using FakeItEasy;
+using System;
 using System.Threading;
-using FakeItEasy;
 using Xunit;
 
 namespace M.EventBroker.Tests
 {
-    public class FixedCountThreadsRunnerTests
+    public class RestrictedThreadPoolRunnerTests
     {
         [Fact]
-        public void Run_WithMultipleActionsAndMultipleWorkers_ActionsAreRunnedOnDifferentThreads()
+        public void Run_WithRestrictionOfTwoAndTwoActions_ActionsAreRunnedOnDifferentThreads()
         {
             // Arrange
             int? thread1 = null;
@@ -17,7 +17,7 @@ namespace M.EventBroker.Tests
             int? thread2 = null;
             Action action2 = () => { thread2 = Thread.CurrentThread.ManagedThreadId; Thread.Sleep(30); };
 
-            var runner = new FixedCountThreadsRunner(2);
+            var runner = new RestrictedThreadPoolRunner(2);
 
             // Act
             runner.Run(action1, action2);
@@ -35,20 +35,25 @@ namespace M.EventBroker.Tests
         }
 
         [Fact]
-        public void Run_WithMultipleSubscribersAndSingleWorker_AllActionsAreRunned()
+        public void Run_WithRestrictionOfOneAndMultipleAcrions_AllActionsAreRunned()
         {
             // Arrange
             var action1 = A.Fake<IAction>();
-            var action2 = A.Fake<IAction>();
-            var action3 = A.Fake<IAction>();
+            A.CallTo(() => action1.Action()).Invokes(() => Thread.Sleep(50));
 
-            var runner = new FixedCountThreadsRunner(1);
+            var action2 = A.Fake<IAction>();
+            A.CallTo(() => action2.Action()).Invokes(() => Thread.Sleep(50));
+
+            var action3 = A.Fake<IAction>();
+            A.CallTo(() => action3.Action()).Invokes(() => Thread.Sleep(50));
+
+            var runner = new RestrictedThreadPoolRunner(1);
 
             // Act
             runner.Run(action1.Action, action2.Action, action3.Action);
 
             // Assert
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
             A.CallTo(() => action1.Action())
              .MustHaveHappened(Repeated.Exactly.Once);
 
@@ -60,16 +65,16 @@ namespace M.EventBroker.Tests
         }
 
         [Fact]
-        public void Constructor_WithNegativeThreadsCount_ThrowsException()
+        public void Constructor_WithNegativeMaxConcurrentHandlers_ThrowsException()
         {
-            Action constructor = () => new FixedCountThreadsRunner(-3);
+            Action constructor = () => new RestrictedThreadPoolRunner(-3);
             Assert.Throws<ArgumentOutOfRangeException>(constructor);
         }
 
         [Fact]
-        public void Constructor_WithZeroThreadsCount_ThrowsException()
+        public void Constructor_WithZeroMaxConcurrentHandlers_ThrowsException()
         {
-            Action constructor = () => new FixedCountThreadsRunner(0);
+            Action constructor = () => new RestrictedThreadPoolRunner(0);
             Assert.Throws<ArgumentOutOfRangeException>(constructor);
         }
 
@@ -84,7 +89,7 @@ namespace M.EventBroker.Tests
             A.CallTo(() => action2.Action()).Invokes(() => Thread.Sleep(200));
 
             // Act
-            using (var runner = new FixedCountThreadsRunner(1))
+            using (var runner = new RestrictedThreadPoolRunner(1))
             {
                 runner.Run(action1.Action, action2.Action);
             }
@@ -107,7 +112,7 @@ namespace M.EventBroker.Tests
             A.CallTo(() => action1.Action()).Invokes(() => Thread.Sleep(200));
 
             // Act
-            using (var runner = new FixedCountThreadsRunner(1))
+            using (var runner = new RestrictedThreadPoolRunner(1))
             {
                 runner.Run(action1.Action);
                 runner.Dispose();
