@@ -68,7 +68,7 @@ namespace M.EventBroker.EvenHandlerRunners
                 {
                     lock (_locker)
                     {
-                        if(_currentlyRunning < _maxConcurrentHandlers)
+                        if (_currentlyRunning < _maxConcurrentHandlers)
                         {
                             _currentlyRunning++;
                             Task.Run(RunHandler(action));
