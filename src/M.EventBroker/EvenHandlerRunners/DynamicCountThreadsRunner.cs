@@ -22,7 +22,7 @@ namespace M.EventBroker.EvenHandlerRunners
         /// <param name="config">Specifies configuration for handler threads.</param>
         public DynamicCountThreadsRunner(DynamicCountThreadsRunnerConfig config)
         {
-            _config = config;
+            _config = config != null ? config : throw new ArgumentNullException($"Parameter {nameof(config)} should be initialized (value was: null)");
             _isRunning = true;
 
             Thread tracker = new Thread(Tracker);
@@ -51,7 +51,7 @@ namespace M.EventBroker.EvenHandlerRunners
             if (_isRunning)
             {
                 _isRunning = false;
-                while(_runningThreads.Count > 0)
+                while (_runningThreads.Count > 0)
                 {
                     var threadInfo = _runningThreads.Pop();
                     threadInfo.IsRunning = false;
@@ -97,7 +97,7 @@ namespace M.EventBroker.EvenHandlerRunners
 
         private void StartWorkerThread()
         {
-            if(_runningThreads.Count > _config.MaxThreadsCount)
+            if (_runningThreads.Count > _config.MaxThreadsCount)
             {
                 return;
             }
@@ -110,7 +110,7 @@ namespace M.EventBroker.EvenHandlerRunners
 
         private void ReleaseWorkerThread()
         {
-            if(_runningThreads.Count == 1)
+            if (_runningThreads.Count == 1)
             {
                 return;
             }
