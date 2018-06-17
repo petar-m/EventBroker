@@ -29,7 +29,7 @@ namespace M.EventBroker.EvenHandlerRunners
         }
 
         /// <summary>
-        /// Runs events handlers on available backgrround thread.
+        /// Runs events handlers on available background thread.
         /// </summary>
         /// <param name="handlers">The event handlers to run.</param>
         public void Run(params Action[] handlers)

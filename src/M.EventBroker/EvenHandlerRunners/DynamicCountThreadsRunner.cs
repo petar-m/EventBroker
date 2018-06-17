@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace M.EventBroker.EvenHandlerRunners
@@ -14,8 +13,8 @@ namespace M.EventBroker.EvenHandlerRunners
         private readonly TimeSpan _timeout = TimeSpan.FromMilliseconds(100);
         private readonly BlockingCollection<Action> _handlerActions = new BlockingCollection<Action>();
         private readonly Stack<ThreadInfo> _runningThreads = new Stack<ThreadInfo>();
-        private bool _isRunning;
         private readonly DynamicCountThreadsRunnerConfig _config;
+        private bool _isRunning;
 
         /// <summary>
         /// Creates a new instance of the DynamicCountThreadsRunner class.
@@ -33,7 +32,7 @@ namespace M.EventBroker.EvenHandlerRunners
         }
 
         /// <summary>
-        /// Runs events handlers on available backgrround thread.
+        /// Runs events handlers on available background thread.
         /// </summary>
         /// <param name="handlers">The event handlers to run.</param>
         public void Run(params Action[] handlers)
