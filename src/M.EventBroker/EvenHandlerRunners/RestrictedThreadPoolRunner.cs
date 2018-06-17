@@ -10,7 +10,7 @@ namespace M.EventBroker.EvenHandlerRunners
     /// </summary>
     public class RestrictedThreadPoolRunner : IEventHandlerRunner
     {
-        private object locker = new object();
+        private readonly object _locker = new object();
         private readonly TimeSpan _timeout = TimeSpan.FromSeconds(1);
         private readonly BlockingCollection<Action> _handlerActions = new BlockingCollection<Action>();
         private int _currentlyRunning = 0;
@@ -66,7 +66,7 @@ namespace M.EventBroker.EvenHandlerRunners
 
                 while (_isRunning)
                 {
-                    lock (locker)
+                    lock (_locker)
                     {
                         if(_currentlyRunning < _maxConcurrentHandlers)
                         {
@@ -87,7 +87,7 @@ namespace M.EventBroker.EvenHandlerRunners
             {
                 handler();
 
-                lock (locker)
+                lock (_locker)
                 {
                     _currentlyRunning--;
                 }
