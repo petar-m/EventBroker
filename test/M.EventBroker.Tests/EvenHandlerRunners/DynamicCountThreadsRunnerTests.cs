@@ -157,6 +157,7 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
             using (var runner = new DynamicCountThreadsRunner(new DynamicCountThreadsRunnerConfig(TimeSpan.FromMilliseconds(10), 2, 2, 2, 2)))
             {
                 runner.Run(action1.Action);
+                Thread.Sleep(20);
                 runner.Dispose();
             }
 
