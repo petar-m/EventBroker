@@ -1,5 +1,4 @@
 # EventBroker
-[![NuGet](https://img.shields.io/nuget/v/M.EventBroker.svg)](https://www.nuget.org/packages/M.EventBroker/1.0.0)  
 
 EventBroker is an implementation of publish/subscribe pattern.  
 
