@@ -104,6 +104,11 @@ namespace M.EventBroker
                 return;
             }
 
+            if (handlers.Count == 0)
+            {
+                return;
+            }
+
             Action CreateHandlerAction(EventHandlerWrapper<TEvent> handler)
             {
                 return () =>
@@ -133,7 +138,7 @@ namespace M.EventBroker
             }
 
             IEnumerable<IEventHandler<TEvent>> handlerInstances = _handlersFactory.HandlersFor<TEvent>();
-            if (handlerInstances == null)
+            if (handlerInstances == null || !handlerInstances.Any())
             {
                 return;
             }

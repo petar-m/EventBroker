@@ -7,16 +7,17 @@ EventBroker is an implementation of publish/subscribe pattern.
 
 - in-memory, in-process scope
 - publishing is 'Fire and Forget' style  
-- event handlers are runned on background threads
+- events don't need to implement specific interface  
+- event handlers are runned on background threads  
+- event handlers can provide filter for the events they want to handle
 - can use different strategies for running event handlers
 - provides different ways for subscribing that can be used side by side
 - subscriptions are based on the event type
-- event handlers can provide filter for the events they want to handle  
-- events don't need to implement specific interface
+ 
 
 ## Usage
 
-check out the wiki
+check out the [wiki](https://github.com/petar-m/EventBroker/wiki)
 
 ## Breaking Changes  
 
