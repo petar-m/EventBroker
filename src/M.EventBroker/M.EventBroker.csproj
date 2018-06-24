@@ -7,15 +7,15 @@
     <Authors>Petar Marinov</Authors>
     <Company>Petar Marinov</Company>
     <Description>A multi-threaded in-memory implementation of publish–subscribe pattern.</Description>
-    <Copyright>Copyright (c) 2017 Petar Marinov</Copyright>
+    <Copyright>Copyright (c) 2018 Petar Marinov</Copyright>
     <PackageLicenseUrl>https://github.com/petar-m/EventBroker/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/petar-m/EventBroker</PackageProjectUrl>
     <RepositoryUrl>https://github.com/petar-m/EventBroker</RepositoryUrl>
     <PackageTags>event broker in-memory publish subscribe</PackageTags>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.0.0</Version>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
