@@ -44,6 +44,6 @@ namespace M.EventBroker
         /// <typeparam name="TEvent">The type of the event.</typeparam>
         /// <param name="event">An <typeparamref name="TEvent"/> instance to be passed to all handlers of the event.</param>
         /// <returns>The task object representing the asynchronous operation.</returns>
-        Task Publish<TEvent>(TEvent @event);
+        Task PublishAsync<TEvent>(TEvent @event);
     }
 }
