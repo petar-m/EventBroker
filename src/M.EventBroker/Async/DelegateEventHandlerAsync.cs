@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace M.EventBroker
+namespace M.EventBroker.Async
 {
     /// <summary>
     /// An adapter used to represent delegate as IEventHandler.
@@ -46,7 +46,7 @@ namespace M.EventBroker
         /// <returns>A value indicating whether the event handler should be executed.</returns>
         public Task<bool> ShouldHandleAsync(TEvent @event)
         {
-            if(_filter is null)
+            if (_filter is null)
             {
                 return Task.FromResult(true);
             }

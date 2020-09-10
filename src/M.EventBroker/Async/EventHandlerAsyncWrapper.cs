@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace M.EventBroker
+namespace M.EventBroker.Async
 {
     internal class EventHandlerAsyncWrapper<TEvent> : IEventHandlerAsync<TEvent>
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace M.EventBroker
+namespace M.EventBroker.Async
 {
     /// <summary>
     /// Manages event subscriptions and invoking of event handlers.

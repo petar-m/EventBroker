@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace M.EventBroker.Tests
+namespace M.EventBroker.Async.Tests
 {
     public interface IActionAsync
     {
