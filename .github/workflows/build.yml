@@ -2,13 +2,13 @@ name: .NET
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths-ignore:
       - "*.md"
     tags:
       - '*'
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
     paths-ignore:
       - "*.md"
       
