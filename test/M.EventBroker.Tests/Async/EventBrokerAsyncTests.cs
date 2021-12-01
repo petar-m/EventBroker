@@ -25,7 +25,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.RunAsync(A<Func<Task>>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.RunAsync(A<Func<Task>>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -110,10 +110,10 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.RunAsync(A<Func<Task>>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.HandleAsync("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.RunAsync(A<Func<Task>>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.HandleAsync("event"))
              .MustNotHaveHappened();
@@ -183,7 +183,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.RunAsync(A<Func<Task>>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.HandleAsync("event"))
              .MustNotHaveHappened();
@@ -210,7 +210,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.RunAsync(A<Func<Task>>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.HandleAsync("event"))
              .MustNotHaveHappened();
@@ -250,13 +250,13 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerMock1.HandleAsync("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock2.HandleAsync("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock3.HandleAsync("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock4.HandleAsync(A<int>.Ignored))
              .MustNotHaveHappened();
@@ -274,7 +274,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Dispose())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -305,7 +305,7 @@ namespace M.EventBroker.Async.Tests
             // Assert
             Thread.Sleep(500);
             A.CallTo(() => handlerRunnerMock.RunAsync(A<Func<Task>>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.HandleAsync("event"))
              .MustNotHaveHappened();
@@ -337,7 +337,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerMock.OnErrorAsync(A<Exception>.Ignored, "event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -425,7 +425,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerMock.OnErrorAsync(A<Exception>.Ignored, "event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -487,7 +487,7 @@ namespace M.EventBroker.Async.Tests
 
             // Assert
             A.CallTo(() => handlerMock.OnErrorAsync(A<Exception>.Ignored, "event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]

@@ -25,7 +25,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -110,10 +110,10 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.Handle("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.Handle("event"))
              .MustNotHaveHappened();
@@ -183,7 +183,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.Handle("event"))
              .MustNotHaveHappened();
@@ -210,7 +210,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.Handle("event"))
              .MustNotHaveHappened();
@@ -250,13 +250,13 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerMock1.Handle("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock2.Handle("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock3.Handle("event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock4.Handle(A<int>.Ignored))
              .MustNotHaveHappened();
@@ -274,7 +274,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerRunnerMock.Dispose())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -305,7 +305,7 @@ namespace M.EventBroker.Tests
             // Assert
             Thread.Sleep(500);
             A.CallTo(() => handlerRunnerMock.Run(A<Action>.Ignored))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => handlerMock.Handle("event"))
              .MustNotHaveHappened();
@@ -337,7 +337,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, "event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -425,7 +425,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, "event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -487,7 +487,7 @@ namespace M.EventBroker.Tests
 
             // Assert
             A.CallTo(() => handlerMock.OnError(A<Exception>.Ignored, "event"))
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]

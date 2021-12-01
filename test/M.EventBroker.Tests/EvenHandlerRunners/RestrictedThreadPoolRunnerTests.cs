@@ -56,13 +56,13 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
             // Assert
             Thread.Sleep(1000);
             A.CallTo(() => action1.Action())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => action2.Action())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => action3.Action())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
             Thread.Sleep(1000);
 
             A.CallTo(() => action1.Action())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => action2.Action())
              .MustNotHaveHappened();

@@ -1,35 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
 
-  <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="4.6.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
-    <PackageReference Include="OpenCover" Version="4.6.519" />
-    <PackageReference Include="ReportGenerator" Version="3.1.2" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-  </ItemGroup>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\M.EventBroker\M.EventBroker.csproj" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="test_coverage\coverage\**" />
-    <EmbeddedResource Remove="test_coverage\coverage\**" />
-    <None Remove="test_coverage\coverage\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FakeItEasy" Version="7.2.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+		<PackageReference Include="xunit" Version="2.4.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="test_coverage\coverage.xml" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\M.EventBroker\M.EventBroker.csproj" />
+	</ItemGroup>
 
-  <PropertyGroup>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  
+	<ItemGroup>
+		<Compile Remove="test_coverage\coverage\**" />
+		<EmbeddedResource Remove="test_coverage\coverage\**" />
+		<None Remove="test_coverage\coverage\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Remove="test_coverage\coverage.xml" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<DebugType>full</DebugType>
+	</PropertyGroup>
+
 </Project>

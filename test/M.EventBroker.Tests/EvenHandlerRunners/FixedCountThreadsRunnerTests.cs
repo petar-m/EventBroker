@@ -51,13 +51,13 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
             // Assert
             Thread.Sleep(100);
             A.CallTo(() => action1.Action())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => action2.Action())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
 
             A.CallTo(() => action3.Action())
-             .MustHaveHappened(Repeated.Exactly.Once);
+             .MustHaveHappenedOnceExactly();
         }
 
         [Fact]

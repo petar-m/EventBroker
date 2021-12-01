@@ -1,0 +1,93 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - "*.md"
+    tags:
+      - '*'
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - "*.md"
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+
+    steps:
+
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    
+    - id: get-version
+      name: Get Version From Branch Name
+      run: |
+        version=$(echo ${{ github.ref }} | cut -c 11-)
+        echo "::set-output name=version::$version"
+    
+    - name: Print Version Info
+      run: |
+        echo "version from tag - ${{steps.get-version.outputs.version}}"
+        echo "is tag - $IS_TAG"
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      if: ${{ env.IS_TAG == 'false' }}
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Build Release
+      if: ${{ env.IS_TAG == 'true' }}
+      run: dotnet build --no-restore --configuration Release -p:Version=${{steps.get-version.outputs.version}}
+    
+    - name: Run Unit Tests
+      run: dotnet test --no-build --verbosity normal --configuration Release --logger trx --collect:"XPlat Code Coverage" --results-directory ./testresults
+    - name: Unit Test Results
+      uses: NasAmin/trx-parser@v0.2.0
+      with:
+        TRX_PATH: testresults
+        REPO_TOKEN: ${{ github.token }}
+        IGNORE_FAILURE: false
+    
+    - name: Copy Coverage
+      run: cp testresults/**/coverage.cobertura.xml testresults/coverage.cobertura.xml
+    
+    - name: Code Coverage Summary Report
+      uses: irongut/CodeCoverageSummary@v1.0.2
+      with:
+        filename: testresults/coverage.cobertura.xml
+        badge: true
+        format: 'markdown'
+        output: 'both'
+    
+    - name: Create NuGet Package
+      if: ${{ env.IS_TAG == 'true' }}    
+      run: dotnet pack src/M.EventBroker/M.EventBroker.csproj -p:PackageVersion=${{steps.get-version.outputs.version}} --output ./ --configuration Release --no-restore --no-build  -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+    
+    - name: Upload a Nuget Package Build Artifact
+      if: ${{ env.IS_TAG == 'true' }}
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: NuGet package
+        path: ./*.nupkg
+        retention-days: 1
+    
+    - name: Upload a Nuget Symbols Package Build Artifact
+      if: ${{ env.IS_TAG == 'true' }}    
+      uses: actions/upload-artifact@v2.2.4
+      with:
+        name: NuGet symbols package
+        path: ./*.snupkg
+        retention-days: 1
+
+    - name: Publish NuGet Package
+      if: ${{ env.IS_TAG == 'true' }}    
+      run: dotnet nuget push "*.nupkg" -k ${{ secrets.NUGET_API }} -s https://api.nuget.org/v3/index.json

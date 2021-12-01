@@ -91,7 +91,7 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
             Assert.NotEqual(thread1, thread2);
             Assert.Equal(2, runner.WorkerThreadsCount);
 
-            Thread.Sleep(100);
+            Thread.Sleep(200);
             Assert.Equal(1, runner.WorkerThreadsCount);
         }
 
