@@ -11,6 +11,8 @@ namespace M.EventBroker.Async.EvenHandlerRunners.Tests
         public async Task Run_WithMultipleActions_ActionsAreRunnedOnDifferentThreads()
         {
             // Arrange
+            int currentThreadId = Thread.CurrentThread.ManagedThreadId;
+
             int? thread1 = null;
             Func<Task> action1 = async () => { thread1 = Thread.CurrentThread.ManagedThreadId; await Task.Delay(30).ConfigureAwait(false); };
 
@@ -26,10 +28,10 @@ namespace M.EventBroker.Async.EvenHandlerRunners.Tests
             Thread.Sleep(100);
 
             Assert.NotNull(thread1);
-            Assert.NotEqual(Thread.CurrentThread.ManagedThreadId, thread1);
+            Assert.NotEqual(currentThreadId, thread1);
 
             Assert.NotNull(thread2);
-            Assert.NotEqual(Thread.CurrentThread.ManagedThreadId, thread2);
+            Assert.NotEqual(currentThreadId, thread2);
 
             Assert.NotEqual(thread1, thread2);
         }

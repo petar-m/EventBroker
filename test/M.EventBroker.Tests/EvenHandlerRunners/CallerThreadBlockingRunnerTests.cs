@@ -11,6 +11,8 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
         public void Run_WithMultipleActions_ActionsAreRunnedOnDifferentThreads()
         {
             // Arrange
+            int currentThreadId = Thread.CurrentThread.ManagedThreadId;
+
             int? thread1 = null;
             Action action1 = () => { thread1 = Thread.CurrentThread.ManagedThreadId; Thread.Sleep(30); };
 
@@ -24,10 +26,10 @@ namespace M.EventBroker.Tests.EvenHandlerRunners
 
             // Assert
             Assert.NotNull(thread1);
-            Assert.Equal(Thread.CurrentThread.ManagedThreadId, thread1);
+            Assert.Equal(currentThreadId, thread1);
 
             Assert.NotNull(thread2);
-            Assert.Equal(Thread.CurrentThread.ManagedThreadId, thread2);
+            Assert.Equal(currentThreadId, thread2);
         }
     }
 }
