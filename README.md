@@ -1,4 +1,5 @@
-# EventBroker
+# EventBroker  
+[![build](https://github.com/petar-m/M.EventBroker/actions/workflows//build.yml/badge.svg)](https://github.com/petar-m/M.EventBroker/actions)
 [![NuGet](https://img.shields.io/nuget/v/M.EventBroker.svg)](https://www.nuget.org/packages/M.EventBroker)  
 
 EventBroker is an implementation of publish/subscribe pattern.  
